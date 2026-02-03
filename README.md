@@ -62,6 +62,8 @@ You can call this service from Developer Tools, automations, or scripts.
 
 - Ensure your Home Assistant host has a working Bluetooth adapter.
 - The clocks must be powered on and within Bluetooth range.
+- **Connection slot errors:** If you see `BleakOutOfConnectionSlotsError`, restart Home Assistant to release stuck BLE connections. BLE adapters typically support only 3-7 simultaneous connections.
+- **Wrong time (off by 1 hour):** This was caused by incorrect DST detection and has been fixed. The component now correctly detects whether Daylight Saving Time is currently active using `time.localtime().tm_isdst`.
 
 ## Credits
 

@@ -7,6 +7,8 @@ import time
 from datetime import datetime
 
 from bleak import BleakClient
+from bleak.backends.device import BLEDevice
+from bleak_retry_connector import establish_connection
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,9 +35,10 @@ class Lywsd02Client:
         'F': b'\x01',
     }
 
-    def __init__(self, mac, notification_timeout=5.0):
-        self._mac = mac
-        self._client = BleakClient(mac)
+    def __init__(self, ble_device: BLEDevice, notification_timeout=5.0):
+        self._ble_device = ble_device
+        self._mac = ble_device.address
+        self._client = None
         self._notification_timeout = notification_timeout
         self._tz_offset = None
         self._data = SensorData(None, None)
@@ -44,9 +47,12 @@ class Lywsd02Client:
 
     @contextlib.asynccontextmanager
     async def connect(self):
-        if not self._client.is_connected:
-            _LOGGER.debug('Connecting to %s', self._mac)
-            await self._client.connect()
+        _LOGGER.debug('Connecting to %s using bleak-retry-connector', self._mac)
+        self._client = await establish_connection(
+            BleakClient,
+            self._ble_device,
+            self._mac,
+        )
         try:
             yield self
         finally:
@@ -57,10 +63,14 @@ class Lywsd02Client:
     def tz_offset(self):
         if self._tz_offset is not None:
             return self._tz_offset
-        elif time.daylight:
-            return -time.altzone // 3600
         else:
-            return -time.timezone // 3600
+            # Use localtime to check if DST is currently active (tm_isdst)
+            # time.daylight only indicates if DST rules exist, not if DST is active now
+            local_time = time.localtime()
+            if local_time.tm_isdst and time.daylight:
+                return -time.altzone // 3600
+            else:
+                return -time.timezone // 3600
 
     @tz_offset.setter
     def tz_offset(self, tz_offset: int):
