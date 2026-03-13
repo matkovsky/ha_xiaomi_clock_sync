@@ -9,11 +9,11 @@ DOMAIN = "xiaomi_clock_sync"
 async def async_setup(hass: HomeAssistant, config: dict):
     async def handle_sync_time(call: ServiceCall):
         device_ids = call.data.get("devices", [])
-        
+
         if not device_ids:
             _LOGGER.error("No devices specified for time sync")
             return
-        
+
         for device_id in device_ids:
             # Get the BLEDevice from HA's bluetooth integration
             ble_device = bluetooth.async_ble_device_from_address(

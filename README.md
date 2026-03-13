@@ -10,7 +10,7 @@ This Home Assistant custom component allows you to synchronize the time on one o
 
 ## Installation
 
-1. **Copy the files**  
+1. **Copy the files**
    Place the `xiaomi_clock_sync` folder in your Home Assistant `custom_components` directory.
 
 2. **Enable in configuration.yaml file**
@@ -20,10 +20,10 @@ This Home Assistant custom component allows you to synchronize the time on one o
    xiaomi_clock_sync:
    ```
 
-3. **Restart Home Assistant**  
+3. **Restart Home Assistant**
    After copying the files, restart Home Assistant to load the new component.
 
-> **Note:**  
+> **Note:**
 > You do **not** need to install the `bleak` library manually. Home Assistant will automatically install all required dependencies as specified in `manifest.json`.
 
 ## Configuration
